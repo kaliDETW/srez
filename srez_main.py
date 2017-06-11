@@ -100,7 +100,7 @@ def setup_tensorflow():
     random.seed(FLAGS.random_seed)
     np.random.seed(FLAGS.random_seed)
 
-    summary_writer = tf.train.SummaryWriter(FLAGS.train_dir, sess.graph)
+    summary_writer = tf.summary.FileWriter(FLAGS.train_dir, sess.graph)
 
     return sess, summary_writer
 
@@ -109,12 +109,12 @@ def _demo():
     if not tf.gfile.IsDirectory(FLAGS.checkpoint_dir):
         raise FileNotFoundError("Could not find folder `%s'" % (FLAGS.checkpoint_dir,))
 
-    # Setup global tensorflow state
-    sess, summary_writer = setup_tensorflow()
-
     # Prepare directories
     filenames = prepare_dirs(delete_train_dir=False)
 
+    # Setup global tensorflow state
+    sess, summary_writer = setup_tensorflow()
+	
     # Setup async input queues
     features, labels = srez_input.setup_inputs(sess, filenames)
 
@@ -138,11 +138,12 @@ class TrainData(object):
         self.__dict__.update(dictionary)
 
 def _train():
-    # Setup global tensorflow state
-    sess, summary_writer = setup_tensorflow()
 
     # Prepare directories
     all_filenames = prepare_dirs(delete_train_dir=True)
+
+    # Setup global tensorflow state
+    sess, summary_writer = setup_tensorflow()
 
     # Separate training and test sets
     train_filenames = all_filenames[:-FLAGS.test_vectors]
